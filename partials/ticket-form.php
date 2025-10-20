@@ -10,78 +10,78 @@ $eventEnd = (clone $eventStart)->modify('+6 hours');
 <form method="POST" action="dashboard.php" class="ticket-form">
     <input type="hidden" name="action" value="create">
     
-    <div class="form-group">
-        <label for="title">Ticket Title *</label>
-        <input type="text" name="title" id="title" required>
+    <div class="mb-3">
+        <label for="title" class="form-label">Ticket Title *</label>
+        <input type="text" name="title" id="title" class="form-control" required>
     </div>
     
-    <div class="form-group">
-        <label for="location">Location</label>
-        <input type="text" name="location" id="location" required>
+    <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" name="location" id="location" class="form-control" required>
     </div>
     
-    <div class="form-group">
-        <label for="description">Description</label>
-        <textarea name="description" id="description" rows="4"></textarea>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea name="description" id="description" rows="4" class="form-control"></textarea>
     </div>
     
-    <div class="form-row">
-        <div class="form-group">
-            <label for="instructions">Instructions</label>
-            <textarea name="instructions" id="instructions" rows="4"></textarea>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="instructions" class="form-label">Instructions</label>
+            <textarea name="instructions" id="instructions" rows="4" class="form-control"></textarea>
         </div>
-        <div class="form-group">
-            <label for="price">Price *</label>
-            <input type="number" name="price" id="price" step="0.01" min="0" placeholder="0.00" required>
+        <div class="col-md-6">
+            <label for="price" class="form-label">Price *</label>
+            <input type="number" name="price" id="price" class="form-control" step="0.01" min="0" placeholder="0.00" required>
         </div>
     </div>
     
-    <div class="form-row">
-        <div class="form-group">
-            <label for="quantity">Quantity Available *</label>
-            <input type="number" name="quantity" id="quantity" min="1" placeholder="1" required>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="quantity" class="form-label">Quantity Available *</label>
+            <input type="number" name="quantity" id="quantity" class="form-control" min="1" placeholder="1" required>
         </div>
-        <div class="form-group">
-            <label for="visibility">Ticket Visibility *</label>
-            <select name="visibility" id="visibility" required>
+        <div class="col-md-6">
+            <label for="visibility" class="form-label">Ticket Visibility *</label>
+            <select name="visibility" id="visibility" class="form-select" required>
                 <option value="public" selected>Public</option>
                 <option value="private">Private</option>
             </select>
         </div>
     </div>
     
-    <div class="form-row">
-        <div class="form-group">
-            <label for="sale_start">Sale Start Date & Time *</label>
-            <input type="datetime-local" name="sale_start" id="sale_start" 
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="sale_start" class="form-label">Sale Start Date & Time *</label>
+            <input type="datetime-local" name="sale_start" id="sale_start" class="form-control"
                    value="<?php echo $saleStart->format('Y-m-d\TH:i'); ?>" required>
         </div>
-        <div class="form-group">
-            <label for="sale_end">Sale End Date & Time *</label>
-            <input type="datetime-local" id="sale_end" name="sale_end" 
+        <div class="col-md-6">
+            <label for="sale_end" class="form-label">Sale End Date & Time *</label>
+            <input type="datetime-local" id="sale_end" name="sale_end" class="form-control"
                    value="<?php echo $saleEnd->format('Y-m-d\TH:i'); ?>" required>
         </div>
     </div>
     
-    <div class="form-row">
-        <div class="form-group">
-            <label for="event_start">Event Start Date & Time *</label>
-            <input type="datetime-local" name="event_start" id="event_start" 
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="event_start" class="form-label">Event Start Date & Time *</label>
+            <input type="datetime-local" name="event_start" id="event_start" class="form-control"
                    value="<?php echo $eventStart->format('Y-m-d\TH:i'); ?>" required>
         </div>
-        <div class="form-group">
-            <label for="event_end">Event End Date & Time *</label>
-            <input type="datetime-local" name="event_end" id="event_end" 
+        <div class="col-md-6">
+            <label for="event_end" class="form-label">Event End Date & Time *</label>
+            <input type="datetime-local" name="event_end" id="event_end" class="form-control"
                    value="<?php echo $eventEnd->format('Y-m-d\TH:i'); ?>" required>
         </div>
     </div>
     
-    <div class="form-group">
-        <label for="image">Image URL (optional)</label>
-        <input type="url" name="image" id="image" placeholder="https://example.com/image.jpg">
+    <div class="mb-3">
+        <label for="image" class="form-label">Image URL (optional)</label>
+        <input type="url" name="image" id="image" class="form-control" placeholder="https://example.com/image.jpg">
     </div>
     
-    <div class="form-actions">
+    <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary">Create Ticket</button>
     </div>
 </form>
