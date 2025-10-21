@@ -4,71 +4,81 @@ session_start();
 $dbo = new Database();
 
 // handeling form submissions
+
+ $toDt = function($v) {
+     return $v ? str_replace('T',' ', $v) . (strlen($v) === 16 ? ':00' : '') : null;
+     };
+
 if($_POST && isset($_POST['action'])){
-    if($_POST['action'] === 'create'){
-        try{
+    try{
+        if($_POST['action'] === 'create'){
             $cmd = "INSERT INTO tickets (title, description, location, instructions, price, quantity, sale_start, sale_end, event_start, event_end, visibility, image) VALUES (?, ? , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt= $dbo-> conn-> prepare($cmd);
             $stmt->execute([
                 $_POST['title'], 
-                $_POST['description'],
+                $_POST['description'] ?? null,
                 $_POST['location'],
-                $_POST['instructions'],
+                $_POST['instructions'] ?? null,
                 $_POST['price'],
                 $_POST['quantity'],
-                $_POST['sale_start'],
-                $_POST['sale_end'],
-                $_POST['event_start'],
-                $_POST['event_end'],
+                $toDt($_POST['sale_start']),
+                $toDt($_POST['sale_end']),
+                $toDt($_POST['event_start']),
+                $toDt($_POST['event_end']),
                 $_POST['visibility'],
-                $_POST['image']
+                $_POST['image'] ?? null
             ]);
             $_SESSION['success']  = "Ticket created successfully!";
-            header("Location: dashboard.php");
-
-        //handle ticket/form updates
-        if($_POST['action']=== 'update' && !empty($_POST['id'])){
-            $cmd = "UPDATE tickets SET title = ?, description = ?, location = ?, instruction = ?, price = ?, quantity=?, sale_start = ?, sale_end = ?, event_start = ?, event_end = ?, visibility = ?, image = ? 
-            WHERE id = ? AND is_deleted = 0";
-            $stmt= $dbo->conn->prepare($cmd);
-            $stmt->execute([
-                $_POST['title'], 
-                $_POST['description'],
-                $_POST['location'],
-                $_POST['instructions'],
-                $_POST['price'],
-                $_POST['quantity'],
-                $_POST['sale_start'],
-                $_POST['sale_end'],
-                $_POST['event_start'],
-                $_POST['event_end'],
-                $_POST['visibility'],
-                $_POST['image']
-            ]);
-            $_SESSION['success'] = "Ticket updated successfully.";
-            header("Location: dashboard.php"); 
-            exit;
-        }
-
-        //soft-delete ticket
-        if($_POST['action']==='delete' && !empty($_POST['id'])){
-            $stmt = $dbo->conn->prepare("UPDATE tickets SET is_deleted = 1 WHERE id = ?");
-            $stmt->execute([$_POST['id']]);
-            $_SESSION['success'] = "Ticket deleted.";
             header("Location: dashboard.php");
             exit;
         }
         
-        }catch(PDOException $e){
+        //handle ticket updates
+    if($_POST['action']=== 'update' && !empty($_POST['id'])){
+        $cmd = "UPDATE tickets 
+            SET title = ?, description = ?, location = ?, instructions = ?, price = ?, quantity= ?, sale_start = ?, sale_end = ?, event_start = ?, event_end = ?, visibility = ?, image = ? 
+            WHERE id = ? AND is_deleted = 0";
+        $stmt= $dbo->conn->prepare($cmd);
+        $stmt->execute([
+            $_POST['title'], 
+            $_POST['description'] ?? null,
+            $_POST['location'],
+            $_POST['instructions'] ?? null,
+            $_POST['price'],
+            $_POST['quantity'],
+            $toDt($_POST['sale_start']),
+            $toDt($_POST['sale_end']),
+            $toDt($_POST['event_start']),
+            $toDt($_POST['event_end']),
+            $_POST['visibility'],
+            $_POST['image'] ?? null, 
+            $_POST['id'] 
+        ]);
+        $_SESSION['success'] = "Ticket updated successfully.";
+        header("Location: dashboard.php"); 
+        exit;
+    }
+
+    //soft-delete ticket
+    if($_POST['action']==='delete' && !empty($_POST['id'])){
+        $stmt = $dbo->conn->prepare("UPDATE tickets SET is_deleted = 1 WHERE id = ?");
+        $stmt->execute([$_POST['id']]);
+        $_SESSION['success'] = "Ticket deleted.";
+        header("Location: dashboard.php");
+        exit;
+        }
+    }catch(PDOException $e){
             $_SESSION['error'] = "Error creating ticket:" . $e->getMessage();
         }
     }
 
-}
-
-
-
-
+    $edit = null; 
+    if(!empty($_GET['edit'])){
+        $stmt= $dbo->conn->prepare("SELECT * FROM tickets WHERE id = ? AND is_deleted = 0");
+        $stmt->execute([$_GET['edit']]);
+        $edit = $stmt-> fetch(PDO::FETCH_ASSOC);
+    }
+    
 
 //Tickets for display
 $cmd = "SELECT * FROM tickets WHERE is_deleted = 0 ORDER BY created_at DESC";
@@ -76,8 +86,11 @@ $statement = $dbo->conn->prepare($cmd);
 $statement-> execute();
 
 $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
-
 ?> 
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -112,7 +125,7 @@ $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 
         <section class="mb-4">
-            <h2 class="h4 mb-3">Create new Ticket</h2>
+        <h2 class="h4 mb-3"><?= !empty($edit) ? 'Edit Ticket' : 'Create New Ticket' ?></h2>
             <?php include 'partials/ticket-form.php'; ?>
         </section>
 
@@ -147,8 +160,12 @@ $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
                             </p>
                             
                             <div class="ticket-actions d-flex gap-2 mt-2">
-                                <button class="btn btn-warning btn-sm">Edit</button>
-                                <button class="btn btn-danger btn-sm">Delete</button>
+                               <a href="dashboard.php?edit=<?=(int)$ticket['id'] ?>" class = "btn btn-warning btn-sm">Edit</a> 
+                               <form method="POST" onsubmit="return confirm('Delete this ticket?');">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value ="<?=(int)$ticket['id'] ?>">
+                                    <button type= "submit" class= "btn btn-danger btn-sm">Delete</button>
+                                </form>
                             </div>
                         </div>
                     <?php endforeach; ?>
