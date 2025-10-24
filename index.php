@@ -12,7 +12,7 @@ $cmd = "SELECT * FROM tickets
 WHERE is_deleted = 0
 AND sale_start <= NOW()
 AND sale_end >= NOW()
-AND visibility = 1 
+AND visibility = 'public' 
 ORDER BY event_start ASC";
 $stmt = $dbo->conn->prepare($cmd);
 $stmt->execute();
@@ -31,8 +31,9 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="containter mt-4">
-        <header class="d-flex">
+    <div class="container mt-4">
+        
+        <header class="d-flex justify-content-between mb-3">
             <div>
                 <h1>Available Event Tickets</h1>
                 <p class="text-muted">
@@ -60,59 +61,78 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="row g-4">
                 <?php foreach($tickets as $ticket): ?>
                     <div class="col-md-6 col-lg-4">
-                        <?php if ($ticket['image']): ?>
-                            <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top" style ="height:200px; object-fit:cover;">
-                        <?php endif;?>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">
-                                <?=htmlspecialchars($ticket['title'])?>
-                            </h5>
-                            <p class="cart-text text-success fw-bold fs-4">$<?=number_format($ticket['price'], 2) ?></p>
+                        <div class="card h-100">
+                            <?php if ($ticket['image']): ?>
+                                <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top" style ="height:200px; object-fit:cover;">
+                            <?php endif;?>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">
+                                    <?=htmlspecialchars($ticket['title'])?>
+                                </h5>
+                                <p class="cart-text text-success fw-bold fs-4">$<?=number_format($ticket['price'], 2) ?></p>
 
-                            <?php if ($tickets['description']):?>
-                            <p class="card-text">
-                                <?= htmlspecialchars($ticket['description'])?>
-                            </p>
-                            <?php endif; ?> 
-                            <div class="card-text small text-muted mb-3">
-                                <div class="">
-                                📍 <?= htmlspecialchars($ticket['location'])?> 
-                                </div> 
-                                <div>
-                                    📅 <?= date('M j, Y g:i A', strtotime($ticket['event_start'])) ?>
+                                <?php if ($ticket['description']):?>
+                                <p class="card-text">
+                                    <?= htmlspecialchars($ticket['description'])?>
+                                </p>
+                                <?php endif; ?> 
+                                <div class="card-text small text-muted mb-3">
+                                    <div class="">
+                                    📍 <?= htmlspecialchars($ticket['location'])?> 
+                                    </div> 
+                                    <div>
+                                        📅 <?= date('M j, Y g:i A', strtotime($ticket['event_start'])) ?>
+                                    </div>
+                                    <!-- <div class="">
+                                        🎫<?= $ticket['quantity']?> tickets left  
+                                    </div> -->
                                 </div>
-                                <!-- <div class="">
-                                    🎫<?= $ticket['quantity']?> tickets left  
-                                </div> -->
-                            </div>
-                            <div class="mt-auto">
-                                <div class="d-flex gap-2 align-items-center">
-                                    <select class="form-select form-select-sm">
-                                    <?php for ($i = 1; $i <= min(10, $ticket['quantity']); $i++): ?>
-                                                    <option value="<?= $i ?>"><?= $i ?></option>
-                                                <?php endfor; ?>
-                                    </select>
-                                    <button class="btn btn-primary flex-grow-1 add-to-cart" data-ticket-id="<?= $ticket['id']?> " data-title="<?= htmlspecialchars($ticket['title']) ?>" data-price ="<?= $ticket['price']?> ">
-                                        Add to Cart
-                                    </button>
+                                <div class="mt-auto">
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <select class="form-select form-select-sm" style="max-width: 80px;" id = "qty-<?=$ticket['id'] ?> ">
+                                        <?php for ($i = 1; $i <= min(10, $ticket['quantity']); $i++): ?>
+                                                        <option value="<?= $i ?>"><?= $i ?></option>
+                                                    <?php endfor; ?>
+                                        </select>
+                                        <button class="btn btn-primary flex-grow-1 add-to-cart" data-ticket-id="<?= $ticket['id']?> " data-title="<?= htmlspecialchars($ticket['title']) ?>" data-price ="<?= $ticket['price']?> ">
+                                            Add to Cart
+                                        </button>
+                                    </div>
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 <?php endforeach; ?>
-
             </div>
             <?php endif; ?>
 
     </section>
+    <div class="modal fade" id= "cartModal" tabIndex = "-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Shopping Cart
+                    </h5>
+                    <button type="button" class= "btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cart-items">
+                        cart items go here
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class= "btn btn-secondary" data-bs-dismiss="modal"> Continue Shopping</button>
+                    <button type="button" class="btn btn-primary" id="proceedBtn"> Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
 
 
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/scripts.js"></script>
 </body>
 </html>

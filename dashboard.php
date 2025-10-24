@@ -71,6 +71,7 @@ if($_POST && isset($_POST['action'])){
             $_SESSION['error'] = "Error creating ticket:" . $e->getMessage();
         }
     }
+    
 
     $edit = null; 
     if(!empty($_GET['edit'])){
