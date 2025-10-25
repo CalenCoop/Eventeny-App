@@ -42,7 +42,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <button id = "cartBtn" class = "btn btn-outline-primary position-relative" >
             🛒 Cart
-                <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><?= isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0 ?></span>
             </button>
         </header>
 
@@ -89,12 +89,12 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div class="mt-auto">
                                     <div class="d-flex gap-2 align-items-center">
-                                        <select class="form-select form-select-sm" style="max-width: 80px;" id = "qty-<?=$ticket['id'] ?> ">
+                                        <select class="form-select form-select-sm" style="max-width: 80px;" id = "qty-<?= $ticket['id'] ?>">
                                         <?php for ($i = 1; $i <= min(10, $ticket['quantity']); $i++): ?>
                                                         <option value="<?= $i ?>"><?= $i ?></option>
                                                     <?php endfor; ?>
                                         </select>
-                                        <button class="btn btn-primary flex-grow-1 add-to-cart" data-ticket-id="<?= $ticket['id']?> " data-title="<?= htmlspecialchars($ticket['title']) ?>" data-price ="<?= $ticket['price']?> ">
+                                        <button class="btn btn-primary flex-grow-1 add-to-cart" data-ticket-id="<?= $ticket['id'] ?>" data-title="<?= htmlspecialchars($ticket['title']) ?>" data-price ="<?= $ticket['price']?> ">
                                             Add to Cart
                                         </button>
                                     </div>
@@ -107,7 +107,8 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php endif; ?>
 
     </section>
-    <div class="modal fade" id= "cartModal" tabIndex = "-1">
+  
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -118,7 +119,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-body">
                     <div id="cart-items">
-                        cart items go here
+                        
                     </div>
                 </div>
                 <div class="modal-footer">

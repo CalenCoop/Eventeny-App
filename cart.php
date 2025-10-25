@@ -14,6 +14,17 @@ header('Content-Type: application/json');
     $action = $_POST['action'] ?? $_GET['action'] ?? "";
 
     switch($action){
+        case 'get':
+            //return current cart items
+            echo json_encode([
+                'success' => true, 
+                'cart' => array_values($_SESSION['cart']), 
+                'total_items' => array_sum(array_column($_SESSION['cart'], 'quantity')), 
+                'total_price' => array_sum(array_map(function($item){
+                    return $item['price'] * $item['quantity'];
+                }, $_SESSION['cart']))
+            ]);
+            break;
         case 'add':
             $ticketId = (int)$_POST['ticket_id'];
             $quantity = (int)$_POST['quantity'];
@@ -51,6 +62,7 @@ header('Content-Type: application/json');
                 echo json_encode(['success' => false, 'message' => 'Ticket not found']);
                 }
         }
+        break;
     }
 
 
