@@ -3,11 +3,7 @@ require_once "database/database.php";
 session_start();
 $dbo = new Database();
 
-// handeling form submissions
-
-//  $toDt = function($v) {
-//      return $v ? str_replace('T',' ', $v) . (strlen($v) === 16 ? ':00' : '') : null;
-//      };
+//time conversion
 $toDtUtc = function($v) {
     if (!$v) return null;
     $dt = new DateTime($v); // browser local
@@ -109,6 +105,9 @@ $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body> 
+<script>
+console.log("🔥 If you see this, browser is reading <script> tags above.");
+</script>
     <div class="container mt-4">
         <h1 class="mb-4">Event Organizer Dashboard</h1>
 
@@ -135,9 +134,16 @@ $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
         <h2 class="h4 mb-3"><?= !empty($edit) ? 'Edit Ticket' : 'Create New Ticket' ?></h2>
             <?php include 'partials/ticket-form.php'; ?>
         </section>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 mb-0">Your Tickets (<?= count($tickets) ?>)</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ticketModal">
+                <i class="bi bi-plus-circle"></i> Create New Event
+            </button>
+        </div>
+
 
         <section class="tickets-list">
-            <h2 class="h4 mb-3">Your Tickets (<?= count($tickets) ?>)</h2>
+            <!-- <h2 class="h4 mb-3">Your Tickets (<?= count($tickets) ?>)</h2> -->
             <?php if (empty($tickets)): ?>
                 <p class="text-muted">No tickets created yet. Create your first ticket above!</p>
             <?php else: ?>
@@ -167,11 +173,11 @@ $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
                             </p>
                             
                             <div class="ticket-actions d-flex gap-2 mt-2">
-                               <a href="dashboard.php?edit=<?=(int)$ticket['id'] ?>" class = "btn btn-warning btn-sm">Edit</a> 
+                               <a href="dashboard.php?edit=<?=(int)$ticket['id'] ?>" class = "btn btn-outline-secondary btn-sm">Edit</a> 
                                <form method="POST" onsubmit="return confirm('Delete this ticket?');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value ="<?=(int)$ticket['id'] ?>">
-                                    <button type= "submit" class= "btn btn-danger btn-sm">Delete</button>
+                                    <button type= "submit" class= "btn btn-outline-danger btn-sm">Delete</button>
                                 </form>
                             </div>
                         </div>
@@ -179,10 +185,15 @@ $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             <?php endif; ?>
         </section>
+        <script>
+console.log("🔥 If you see this, browser is reading <script> tags above.");
+</script>
 
-    </div>
-    
+    <script>
+console.log("🔥 If you see this, browser is reading <script> tags above.");
+</script>
 
+    <!-- Scripts at the bottom of body -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/scripts.js"></script>
