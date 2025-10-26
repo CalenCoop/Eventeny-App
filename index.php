@@ -123,13 +123,43 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-body">
                     <div id="cart-items">
-                        
+                        <!-- cart items load here -->
+                    </div>
+                    <div id="review-section" style="display: none;">
+                        <h6 class = "mb-3">Order Review</h6>
+                        <div id="review-items">
+                            <!-- review info loads here -->
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Total:</h5>
+                            <h5 id="review-total">$0.00</h5>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class= "btn btn-outline-primary clear-cart"> Empty Cart</button>
-                    <button type="button" class= "btn btn-secondary" data-bs-dismiss="modal"> Continue Shopping</button>
-                    <button type="button" class="btn btn-primary" id="proceedBtn"> Checkout</button>
+                    <!-- cart buttons -->
+                     <div id="cart-buttons">
+                         <button type="button" class= "btn btn-outline-primary clear-cart"> 
+                            Empty Cart
+                        </button>
+                         <button type="button" class= "btn btn-secondary" data-bs-dismiss="modal">
+                             Continue Shopping
+                            </button>
+                         <button type="button" class="btn btn-primary" id="proceedBtn">
+                            Checkout
+                        </button>
+                    </div>
+                    <!-- review buttons -->
+                     <div id="review-buttons" style="display: none;">
+                        <button type="button" class="btn btn-secondary" id="backToCart">
+                            Back to Cart
+                        </button>
+                        <button type="button" class="btn btn-success" id="completeOrder">
+                            Complete Order
+                        </button>
+                     </div>
+                         
                 </div>
             </div>
         </div>

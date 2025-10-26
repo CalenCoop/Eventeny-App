@@ -98,7 +98,33 @@ header('Content-Type: application/json');
             $_SESSION['cart'] = [];
             echo json_encode(['success' => true, 'message' => ' Cart cleared']); 
             exit;
-    }
+
+        break;
+        
+        case 'complete':
+            $total= 0;
+            $orderItems = []; 
+            
+
+            foreach($_SESSION['cart'] as $item){
+                $price = (float) $item['price'];
+                $subTotal = $price * $item['quantity'];
+                $orderTotal += $subtotal;
+                $orderItems[] = $item; 
+            }
+
+            //clear cart after purchase
+            $_SESSION['cart']=[];
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Order completed successfully!',
+                'order_total' => $orderTotal,
+                'items' => $orderItems
+            ]);
+        break; 
+        
+    };
 
 
 

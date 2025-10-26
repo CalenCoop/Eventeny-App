@@ -1,6 +1,8 @@
 $(document).ready(function () {
   $("#cartBtn").on("click", () => {
-    //when cart button is clicked, open modal
+    //when cart button is clicked, open & reset modal
+    $("#review-section, #review-buttons").hide();
+    $("#cart-items, #cart-buttons").show();
     $("#cartModal").modal("show");
     loadCart();
   });
@@ -81,8 +83,6 @@ $(document).ready(function () {
 
   //clear cart
   $(document).on("click", ".clear-cart", function () {
-    //   $(".clear-cart").on("click", () => {
-    //ajax call to empty card
     $.post(
       "cart.php",
       { action: "clear" },
@@ -169,4 +169,91 @@ $(document).ready(function () {
     }
     $("#cart-items").html(html);
   }
+
+  //handles carts checkout button
+  function showReviewSection() {
+    $("#review-section, #review-buttons").show();
+    $("#cart-items, #cart-buttons").hide();
+
+    loadReviewData();
+  }
+
+  $(document).on("click", "#proceedBtn", function () {
+    showReviewSection();
+  });
+
+  //handles carts back button
+  function showCartSection() {
+    $("#review-section, #review-buttons").hide();
+    $("#cart-items, #cart-buttons").show();
+  }
+
+  $(document).on("click", "#backToCart", function () {
+    showCartSection();
+  });
+
+  //display items in checkout page
+  function displayReviewItems(cart) {
+    let html = "";
+    let total = 0;
+
+    cart.forEach(function (item) {
+      const price = parseFloat(item.price);
+      const subtotal = price * item.quantity;
+      total += subtotal;
+
+      html += `
+         <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <strong>${item.title}</strong><br>
+                    <small class="text-muted">${
+                      item.quantity
+                    } × $${price.toFixed(2)}</small>
+                </div>
+                <div>$${subtotal.toFixed(2)}</div>
+            </div>
+        `;
+    });
+    $("#review-items").html(html);
+    $("#review-total").text(`$${total.toFixed(2)}`);
+  }
+  //load review data
+  function loadReviewData() {
+    $.get(
+      "cart.php?action=get",
+      function (response) {
+        if (response.success) {
+          displayReviewItems(response.cart);
+        }
+      },
+      "json"
+    );
+  }
+
+  //'complete' order
+  function completeOrder() {
+    $.post(
+      "cart.php",
+      {
+        action: "complete",
+      },
+      function (response) {
+        if (response.success) {
+          showAlert(
+            "Order completed succesfully. Thank you for your purchase.",
+            "success"
+          );
+          $("#cartModal").modal("hide");
+          updateCartCount();
+          showCartSection();
+        } else {
+          showAlert("Error: " + response.message, "danger");
+        }
+      }
+    );
+  }
+
+  $(document).on("click", "#completeOrder", function () {
+    completeOrder();
+  });
 });
