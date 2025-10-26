@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set('America/Los_Angeles');
+date_default_timezone_set('UTC');
 $now = new DateTime();
 $saleStart = $now;
 $saleEnd = (clone $saleStart)->modify('+2 days +5 hours');
@@ -10,7 +10,7 @@ $isEditing = !empty($edit);
 
 function dt_val($raw, $fallback){
     if(!$raw) return $fallback;
-    $dt = new DateTime($raw);
+    $dt = new DateTime($raw, new DateTimeZone('UTC')); 
     return $dt->format('Y-m-d\TH:i');
 }
 ?>

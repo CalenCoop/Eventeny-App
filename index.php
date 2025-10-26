@@ -7,13 +7,14 @@ if(!isset($_SESSION['cart'])){
     $_SESSION['cart'] = [];
 }
 
-
-$cmd = "SELECT * FROM tickets 
+$cmd = "SELECT * FROM tickets
 WHERE is_deleted = 0
-AND sale_start <= NOW()
-AND sale_end >= NOW()
-AND visibility = 'public' 
+AND sale_start <= UTC_TIMESTAMP()
+AND sale_end >= UTC_TIMESTAMP()
+AND event_end >= UTC_TIMESTAMP()
+AND visibility = 'public'
 ORDER BY event_start ASC";
+
 $stmt = $dbo->conn->prepare($cmd);
 $stmt->execute();
 $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -34,6 +35,9 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container mt-4">
         
         <header class="d-flex justify-content-between mb-3">
+        <div id="cart-alert-container" class="position-fixed top-0 start-50 translate-middle-x w-50 text-center mt-3" style="z-index: 1050;">
+    <!-- alerts go here -->
+        </div>
             <div>
                 <h1>Available Event Tickets</h1>
                 <p class="text-muted">
@@ -123,6 +127,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class= "btn btn-outline-primary clear-cart"> Empty Cart</button>
                     <button type="button" class= "btn btn-secondary" data-bs-dismiss="modal"> Continue Shopping</button>
                     <button type="button" class="btn btn-primary" id="proceedBtn"> Checkout</button>
                 </div>

@@ -2,6 +2,7 @@
 require_once 'database/database.php';
 session_start();
 
+ 
 //setting responses to JSON 
 header('Content-Type: application/json');
 
@@ -28,41 +29,75 @@ header('Content-Type: application/json');
         case 'add':
             $ticketId = (int)$_POST['ticket_id'];
             $quantity = (int)$_POST['quantity'];
+            
 
             //fetch ticket details from db
-        $cmd = "SELECT * FROM tickets WHERE id = ? AND visibility = 'public' AND is_deleted = 0";
-        $stmt = $dbo-> conn-> prepare($cmd);
-        $stmt-> execute([$ticketId]);
-        $ticket = $stmt-> fetch();
+            $cmd = "SELECT * FROM tickets WHERE id = ? AND visibility = 'public' AND is_deleted = 0";
+            $stmt = $dbo-> conn-> prepare($cmd);
+            $stmt-> execute([$ticketId]);
+            $ticket = $stmt-> fetch();
+            
 
-        if($ticket){
-            //check if still in sale window
-            $now = date('Y-m-d H:i:s');
-            if($ticket['sale_start'] <= $now && $ticket['sale_end'] >= $now){
-                //add/update cart item
-                if(isset($_SESSION['cart'][$ticketId])){
-                    //ticket already in cart, increase amount
-                    $_SESSION['cart'][$ticketId]['quantity'] += $quantity;
+            if($ticket){
+                //check if still in sale window
+                $now = (new DateTime('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+                if($ticket['sale_start'] <= $now && $ticket['sale_end'] >= $now){
+                    //add/update cart item
+                    if(isset($_SESSION['cart'][$ticketId])){
+                        //ticket already in cart, increase amount
+                        $_SESSION['cart'][$ticketId]['quantity'] += $quantity;
+                    }else{
+                        //Not in session, so add to cart
+                        $_SESSION['cart'][$ticketId] = [
+                            'id' => $ticket['id'], 
+                            'title' => $ticket['title'],
+                            'price' => $ticket['price'],
+                            'quantity' => $quantity, 
+                            'max_quantity' => $ticket['quantity']
+                        ]; 
+                    }
+                    //dont go over available ticket amount
+                    if($_SESSION['cart'][$ticketId]['quantity'] > $ticket['quantity']){
+                        $_SESSION['cart'][$ticketId]['quantity'] = $ticket['quantity'];
+                    }
+                    echo json_encode(['success' => true, 'message' => 'Ticket added to cart']);
                 }else{
-                    //Not in session, so add to cart
-                    $_SESSION['cart'][$ticketId] = [
-                        'id' => $ticket['id'], 
-                        'title' => $ticket['title'],
-                        'price' => $ticket['price'],
-                        'quantity' => $quantity, 
-                        'max_quantity' => $ticket['quantity']
-                    ]; 
+                    echo json_encode(['success' => false, 'message' => 'Ticket not found']);
+                    }
+            }
+            break;
+        
+        case 'update':
+            $ticketId = (int)$_POST['ticket_id'];
+            $quantity = (int)$_POST['quantity'];
+            
+            if (isset($_SESSION['cart'][$ticketId])) {
+                if ($quantity > 0 && $quantity <= $_SESSION['cart'][$ticketId]['max_quantity']) {
+                    $_SESSION['cart'][$ticketId]['quantity'] = $quantity;
+                    echo json_encode(['success' => true, 'message' => 'Cart updated']);
+                }else{
+                    echo json_encode(['success' => false, 'message' => 'Invalid quantity']);
                 }
-                //dont go over available ticket amount
-                if($_SESSION['cart'][$ticketId]['quantity'] > $ticket['quantity']){
-                    $_SESSION['cart'][$ticketId]['quantity'] = $ticket['quantity'];
-                }
-                echo json_encode(['success' => true, 'message' => 'Ticket added to cart']);
             }else{
-                echo json_encode(['success' => false, 'message' => 'Ticket not found']);
-                }
-        }
-        break;
+                echo json_encode(['success' => false, 'message' => 'Ticket not found in cart']);
+            }
+            break;
+
+        case 'remove':
+            $ticketId = (int)$_POST['ticket_id'];
+                
+            if (isset($_SESSION['cart'][$ticketId])) {
+                unset($_SESSION['cart'][$ticketId]);
+                echo json_encode(['success' => true, 'message' => 'Ticket removed from cart']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Ticket not found in cart']);
+            }
+            break;
+        
+        case 'clear':
+            $_SESSION['cart'] = [];
+            echo json_encode(['success' => true, 'message' => ' Cart cleared']); 
+            exit;
     }
 
 

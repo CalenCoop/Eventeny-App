@@ -5,9 +5,15 @@ $dbo = new Database();
 
 // handeling form submissions
 
- $toDt = function($v) {
-     return $v ? str_replace('T',' ', $v) . (strlen($v) === 16 ? ':00' : '') : null;
-     };
+//  $toDt = function($v) {
+//      return $v ? str_replace('T',' ', $v) . (strlen($v) === 16 ? ':00' : '') : null;
+//      };
+$toDtUtc = function($v) {
+    if (!$v) return null;
+    $dt = new DateTime($v); // browser local
+    $dt->setTimezone(new DateTimeZone('UTC')); // convert to UTC
+    return $dt->format('Y-m-d H:i:s');
+};
 
 if($_POST && isset($_POST['action'])){
     try{
@@ -21,10 +27,10 @@ if($_POST && isset($_POST['action'])){
                 $_POST['instructions'] ?? null,
                 $_POST['price'],
                 $_POST['quantity'],
-                $toDt($_POST['sale_start']),
-                $toDt($_POST['sale_end']),
-                $toDt($_POST['event_start']),
-                $toDt($_POST['event_end']),
+                $toDtUtc($_POST['sale_start']),
+                $toDtUtc($_POST['sale_end']),
+                $toDtUtc($_POST['event_start']),
+                $toDtUtc($_POST['event_end']),
                 $_POST['visibility'],
                 $_POST['image'] ?? null
             ]);
@@ -46,10 +52,10 @@ if($_POST && isset($_POST['action'])){
             $_POST['instructions'] ?? null,
             $_POST['price'],
             $_POST['quantity'],
-            $toDt($_POST['sale_start']),
-            $toDt($_POST['sale_end']),
-            $toDt($_POST['event_start']),
-            $toDt($_POST['event_end']),
+            $toDtUtc($_POST['sale_start']),
+            $toDtUtc($_POST['sale_end']),
+            $toDtUtc($_POST['event_start']),
+            $toDtUtc($_POST['event_end']),
             $_POST['visibility'],
             $_POST['image'] ?? null, 
             $_POST['id'] 
