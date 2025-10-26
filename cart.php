@@ -109,7 +109,7 @@ header('Content-Type: application/json');
             foreach($_SESSION['cart'] as $item){
                 $price = (float) $item['price'];
                 $subTotal = $price * $item['quantity'];
-                $orderTotal += $subtotal;
+                $orderTotal += $subTotal;
                 $orderItems[] = $item; 
             }
 

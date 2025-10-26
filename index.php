@@ -7,7 +7,30 @@ if(!isset($_SESSION['cart'])){
     $_SESSION['cart'] = [];
 }
 
+//Max amount of events per page setup
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = 12;
+$offset = ($page - 1) * $perPage; 
+
+
+//fetch tickets for the current page
 $cmd = "SELECT * FROM tickets
+WHERE is_deleted = 0
+AND sale_start <= UTC_TIMESTAMP()
+AND sale_end >= UTC_TIMESTAMP()
+AND event_end >= UTC_TIMESTAMP()
+AND visibility = 'public'
+ORDER BY event_start ASC
+LIMIT ? OFFSET ?";
+
+$stmt = $dbo->conn->prepare($cmd);
+$stmt->bindValue(1, $perPage, PDO::PARAM_INT);
+$stmt->bindValue(2, $offset, PDO::PARAM_INT);
+$stmt->execute();
+$tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//get total # of tickets for page calculation
+$comm = "SELECT COUNT(*) FROM tickets
 WHERE is_deleted = 0
 AND sale_start <= UTC_TIMESTAMP()
 AND sale_end >= UTC_TIMESTAMP()
@@ -15,9 +38,10 @@ AND event_end >= UTC_TIMESTAMP()
 AND visibility = 'public'
 ORDER BY event_start ASC";
 
-$stmt = $dbo->conn->prepare($cmd);
-$stmt->execute();
-$tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$countStmt= $dbo->conn->prepare($comm);
+$countStmt->execute();
+$totalTickets = $countStmt-> fetchColumn();
+$totalPages = ceil($totalTickets / $perPage);
 
 
 
@@ -111,6 +135,29 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php endif; ?>
 
     </section>
+
+    <!-- pagination UI -->
+    <?php if($totalPages > 1): ?>
+        <nav aria-label="Ticket pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item <?= ($page == 1) ? 'disabled' : '' ?>">
+                    <a href="?page=<?= $page - 1 ?>" class="page-link"> Previous</a>
+                </li>
+
+                <?php for($i=1; $i <= $totalPages; $i++): ?>
+                    <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                    
+                <?php endfor; ?>
+
+                <li class="page-item <?= ($page == $totalPages) ? 'disabled' : '' ?>">
+                <a class="page-link" href="?page=<?= $page+1 ?>">Next</a>
+                </li>
+            </ul>
+        </nav> 
+        <?php endif ?>
+
   
     <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
