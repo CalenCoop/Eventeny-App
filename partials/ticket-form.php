@@ -15,8 +15,9 @@ function dt_val($raw, $fallback){
 }
 ?>
 
-<form method="POST" action="dashboard.php" class="ticket-form" id= "ticketForm">
-    <input type="hidden" name="action" value="<?= $isEditing ? 'update' : 'create'; ?>">
+<form method="POST" action="dashboard.php" class="ticket-form" id="ticketForm">
+    <input type="hidden" name="action" value="create">
+    <input type="hidden" name="id" id="ticket_id" value="">
     <?php if($isEditing): ?> 
         <input type="hidden" name = "id" value ="<?= (int)$edit['id'];?> ">
     <?php endif ?> 

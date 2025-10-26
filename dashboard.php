@@ -105,9 +105,6 @@ $tickets = $statement->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body> 
-<script>
-console.log("🔥 If you see this, browser is reading <script> tags above.");
-</script>
     <div class="container mt-4">
         <h1 class="mb-4">Event Organizer Dashboard</h1>
 
@@ -128,18 +125,22 @@ console.log("🔥 If you see this, browser is reading <script> tags above.");
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             <?php endif; ?>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 mb-0">Your Tickets (<?= count($tickets) ?>)</h2>
+                <button type="button" class="btn btn-primary" id="toggleFormBtn">
+                    <i class="bi bi-plus-circle"></i> Create New Event
+                </button>
+            </div>
 
-
-        <section class="mb-4">
-        <h2 class="h4 mb-3"><?= !empty($edit) ? 'Edit Ticket' : 'Create New Ticket' ?></h2>
-            <?php include 'partials/ticket-form.php'; ?>
-        </section>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h4 mb-0">Your Tickets (<?= count($tickets) ?>)</h2>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ticketModal">
-                <i class="bi bi-plus-circle"></i> Create New Event
-            </button>
+    <!-- collapsable ticket form  -->
+        <div id="ticket-form-container" style="display: none; ">
+            <section class="mb-4">
+                <h2 class="h4 mb-3"><?= !empty($edit) ? 'Edit Ticket' : 'Create New Ticket' ?></h2>
+                <?php include 'partials/ticket-form.php'; ?>
+            </section>
         </div>
+
 
 
         <section class="tickets-list">
@@ -185,17 +186,14 @@ console.log("🔥 If you see this, browser is reading <script> tags above.");
                 </div>
             <?php endif; ?>
         </section>
-        <script>
-console.log("🔥 If you see this, browser is reading <script> tags above.");
-</script>
+    </div>
+    
 
-    <script>
-console.log("🔥 If you see this, browser is reading <script> tags above.");
-</script>
-
-    <!-- Scripts at the bottom of body -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    window.isEditMode = <?= !empty($edit) ? 'true' : 'false'; ?>;
+</script>
     <script src="assets/scripts.js"></script>
 </body>
 </html>

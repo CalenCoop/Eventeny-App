@@ -256,4 +256,25 @@ $(document).ready(function () {
   $(document).on("click", "#completeOrder", function () {
     completeOrder();
   });
+
+  // //dashboard collapsible form
+  // $(document).on("click", "#toggleFormBtn", function () {
+  //   const container = $("#ticket-form-container");
+  //   container.slideToggle();
+  // });
+
+  // //show form if in edit mode
+  // Dashboard collapsible form
+  $(document).ready(function () {
+    // Toggle form visibility
+    $("#toggleFormBtn").on("click", function () {
+      const container = $("#ticket-form-container");
+      container.slideToggle();
+    });
+
+    // Auto-show form if in edit mode
+    if (window.isEditMode) {
+      $("#ticket-form-container").slideDown();
+    }
+  });
 });
