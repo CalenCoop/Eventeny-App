@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set('America/Los_Angeles');
+date_default_timezone_set('UTC');
 $now = new DateTime();
 $saleStart = $now;
 $saleEnd = (clone $saleStart)->modify('+2 days +5 hours');
@@ -10,16 +10,16 @@ $isEditing = !empty($edit);
 
 function dt_val($raw, $fallback){
     if(!$raw) return $fallback;
-    $dt = new DateTime($raw);
+    $dt = new DateTime($raw, new DateTimeZone('UTC')); 
     return $dt->format('Y-m-d\TH:i');
 }
 ?>
 
-<form method="POST" action="dashboard.php" class="ticket-form">
-    <input type="hidden" name="action" value="<?= $isEditing ? 'update' : 'create'; ?>">
+<form method="POST" action="dashboard.php" class="ticket-form" id="ticketForm">
+    <input type="hidden" name="action" value="<?= $isEditing ? 'update' : 'create' ?>">
     <?php if($isEditing): ?> 
-        <input type="hidden" name = "id" value ="<?= (int)$edit['id'];?> ">
-    <?php endif ?> 
+        <input type="hidden" name="id" value ="<?= (int)$edit['id']; ?>">
+    <?php endif ?>
     
     <div class="mb-3">
         <label for="title" class="form-label">Ticket Title *</label>
