@@ -132,12 +132,8 @@ if (!in_array($sortField, $allowedFields)) $sortField = 'created_at';
 if (!in_array($sortOrder, $allowedOrder)) $sortOrder = 'desc';
 
 
- 
-//Tickets for display
 $cmd = "SELECT * FROM tickets
 WHERE is_deleted = 0
-AND sale_start <= UTC_TIMESTAMP()
-AND sale_end >= UTC_TIMESTAMP()
 AND event_end >= UTC_TIMESTAMP()
 ORDER BY $sortField $sortOrder
 LIMIT ? OFFSET ?";
@@ -151,12 +147,8 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 //get total count of tickets
-// $comm = "SELECT COUNT(*) FROM tickets
-// WHERE is_deleted = 0";
 $comm = "SELECT COUNT(*) FROM tickets
 WHERE is_deleted = 0
-AND sale_start <= UTC_TIMESTAMP()
-AND sale_end >= UTC_TIMESTAMP()
 AND event_end >= UTC_TIMESTAMP()";
 
 $countStmt= $dbo->conn->prepare($comm);
@@ -164,6 +156,8 @@ $countStmt->execute();
 $totalTickets = $countStmt-> fetchColumn();
 // $totalPages = ceil($activeTicketsCount / $perPage);
 $totalPages = ceil($totalTickets / $perPage);
+
+
 ?> 
 
 
@@ -347,9 +341,10 @@ $totalPages = ceil($totalTickets / $perPage);
                     <!-- actions -->
                     <div class="ticket-actions mt-auto pt-3 border-top">
                         <div class="d-grid gap-2">
+                            <!-- update ticket -->
                             <a href="dashboard.php?edit=<?=(int)$ticket['id'] ?>" class = "btn btn-outline-secondary btn-sm">Edit</a> 
 
-
+                            <!-- "delete ticket" -->
                             <form method="POST" onsubmit="return confirm('Are you sure you want to delete this ticket?');">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value ="<?=(int)$ticket['id'] ?>">

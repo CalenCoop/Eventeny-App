@@ -17,6 +17,8 @@ function dt_val($raw, $fallback){
 
 <form method="POST" action="dashboard.php" class="ticket-form" id="ticketForm">
     <input type="hidden" name="action" value="<?= $isEditing ? 'update' : 'create' ?>">
+    
+    <!-- for update query  -->
     <?php if($isEditing): ?> 
         <input type="hidden" name="id" value ="<?= (int)$edit['id']; ?>">
     <?php endif ?>
@@ -98,6 +100,7 @@ function dt_val($raw, $fallback){
     </div>
     
     <div class="d-flex gap-2">
+        <!-- submit/update form  -->
         <button type="submit" class="btn btn-primary"><?= $isEditing ? "Update Ticket" : "Create Ticket";?></button>
         <?php if($isEditing): ?> 
             <a href="dashboard.php" class="btn btn-secondary">Cancel </a>

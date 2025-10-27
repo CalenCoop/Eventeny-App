@@ -120,9 +120,9 @@ $totalPages = ceil($totalTickets / $perPage);
 
                                 <!-- Event img  -->
                                 <?php if (!empty($ticket['image'])): ?>
-                                <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top" style="height:150px; object-fit:cover;">
-                                <?php else: ?>
-                                <img src="assets/placeholder.jpeg" class="card-img-top" style="height:150px; object-fit:cover;">
+                                    <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top" style="height:150px; object-fit:cover;">
+                                    <?php else: ?>
+                                    <img src="assets/placeholder.jpeg" class="card-img-top" style="height:150px; object-fit:cover;">
                                 <?php endif; ?>
 
                                 <div class="card-body d-flex flex-column">
@@ -205,6 +205,7 @@ $totalPages = ceil($totalTickets / $perPage);
         <?php endif ?>
 
   
+        <!-- cart modal ui -->
     <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
