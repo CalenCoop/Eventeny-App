@@ -136,6 +136,7 @@ $(document).ready(function () {
     }, duration);
   }
 
+  //cart items HTML
   function displayCartItems(cart) {
     let html = "";
     if (Object.keys(cart).length === 0) {
@@ -151,21 +152,21 @@ $(document).ready(function () {
                 <select class="form-select form-select-sm quantity-update" style="max-width: 80px;" data-ticket-id="${item.id}">`;
 
         // Add quantity options
-        for (let i = 1; i <= item.max_quantity; i++) {
+        for (let i = 1; i <= Math.min(10, item.max_quantity); i++) {
           html += `<option value="${i}" ${
             i === item.quantity ? "selected" : ""
           }>${i}</option>`;
         }
 
         html += `</select>
-                <span class="ms-2">$${(item.price * item.quantity).toFixed(
-                  2
-                )}</span>
-                <button class="btn btn-sm btn-outline-danger remove-item" data-ticket-id="${
-                  item.id
-                }">×</button>
-            </div>
-        </div>`;
+                  <span class="ms-2">$${(item.price * item.quantity).toFixed(
+                    2
+                  )}</span>
+                  <button class="btn btn-sm btn-outline-danger remove-item" data-ticket-id="${
+                    item.id
+                  }">×</button>
+              </div>
+          </div>`;
       });
     }
     $("#cart-items").html(html);

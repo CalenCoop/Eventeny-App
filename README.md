@@ -50,8 +50,10 @@ This is a full-stack event management system built for a product engineering int
 ## Future Improvements
 
 - Set up a User table & Auth
-  - opens up many other features (public/private routes, etc. )
+  - opens up many other features (public/private routes, favorite events, etc.)
     -ticket verification system
+    -Move Cart to User db
+- Better Error handling
 - Create seperate page for each event
   - To show more detail about events
 - Make UI/UX Mobile friendly

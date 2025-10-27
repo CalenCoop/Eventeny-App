@@ -29,8 +29,12 @@ header('Content-Type: application/json');
         case 'add':
             $ticketId = (int)$_POST['ticket_id'];
             $quantity = (int)$_POST['quantity'];
-            
 
+            
+            if ($ticketId <= 0 || $quantity <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Invalid input']);
+                exit;
+            }    
             //fetch ticket details from db
             $cmd = "SELECT * FROM tickets WHERE id = ? AND visibility = 'public' AND is_deleted = 0";
             $stmt = $dbo-> conn-> prepare($cmd);
@@ -109,6 +113,11 @@ header('Content-Type: application/json');
         case 'complete':
             $orderTotal= 0;
             $orderItems = []; 
+
+              if (empty($_SESSION['cart'])) {
+                    echo json_encode(['success' => false, 'message' => 'Cart is empty']);
+                    exit;
+                }
             
 
             foreach($_SESSION['cart'] as $item){

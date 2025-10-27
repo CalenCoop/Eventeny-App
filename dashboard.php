@@ -132,8 +132,6 @@ if (!in_array($sortField, $allowedFields)) $sortField = 'created_at';
 if (!in_array($sortOrder, $allowedOrder)) $sortOrder = 'desc';
 
 
- 
-
 $cmd = "SELECT * FROM tickets
 WHERE is_deleted = 0
 AND event_end >= UTC_TIMESTAMP()
