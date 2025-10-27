@@ -259,51 +259,87 @@ $totalPages = ceil($activeTicketsCount / $perPage);
         </div>
 
 
-
+<!-- tickets list -->
         <section class="tickets-list">
             <?php if (empty($tickets)): ?>
                 <p class="text-muted">No tickets created yet. Create your first ticket above!</p>
             <?php else: ?>
                 <div class="tickets-grid row g-3">
                     <?php foreach ($tickets as $ticket): ?>
-                        <div class="ticket-card card p-3 h-100 col-md-4">
+                        <div class="ticket-card card p-0 h-100 col-md-4 position-relative shadow-sm">
                         <?php if (!empty($ticket['image'])): ?>
-                            <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top mb-2" style="height:150px; object-fit:cover;">
+                            <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top" style="height:150px; object-fit:cover;">
                         <?php else: ?>
-                            <img src="assets/placeholder.jpeg" class="card-img-top mb-2" style="height:150px; object-fit:cover;">
+                            <img src="assets/placeholder.jpeg" class="card-img-top" style="height:150px; object-fit:cover;">
                         <?php endif; ?>
-                            
-                            <h3 class="card-title h5">
-                                <?= htmlspecialchars($ticket['title']) ?>
-                            </h3>
-                            <p class="price card-text fw-semibold">
-                                $<?= number_format($ticket['price'], 2) ?>
-                            </p>
-                            <p class="location card-text">
-                                <?= htmlspecialchars($ticket['location']) ?>
-                            </p>
-                            <p class="quantity card-text">
-                                Quantity: <?= $ticket['quantity'] ?>
-                            </p>
-                            <p class="quantity-left card-text">
-                            Tickets left: <?= $ticket['quantity']?>
-                            </p>
-                            <p class="visibility card-text">
-                                Visibility: <?= ucfirst($ticket['visibility']) ?>
-                            </p>
-                            <p class="event-date card-text">
-                                Event: <?= date('M j, Y g:i A', strtotime($ticket['event_start'])) ?>
-                            </p>
-                            
-                            <div class="ticket-actions d-flex gap-2 mt-2">
-                               <a href="dashboard.php?edit=<?=(int)$ticket['id'] ?>" class = "btn btn-outline-secondary btn-sm">Edit</a> 
-                               <form method="POST" onsubmit="return confirm('Delete this ticket?');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value ="<?=(int)$ticket['id'] ?>">
-                                    <button type= "submit" class= "btn btn-outline-danger btn-sm">Delete</button>
-                                </form>
+
+                        <!-- status badge -->
+                        <span class="position-absolute top-0 end-0 m-2">
+                            <?php 
+                            $eventEnd = new DateTime($ticket['event_end'], new DateTimeZone('UTC'));
+                            $now = new DateTime('now', new DateTimeZone('UTC'));
+                            if ($eventEnd > $now): ?>
+                                <span class="badge bg-success rounded-pill">Active</span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary rounded-pill">Ended</span>
+                            <?php endif; ?>
+                        </span>
+                    <div class="card-body d-flex flex-column">
+                        <!-- title and price -->
+                        <div class="mb-3">
+                            <h5 class="card-title mb-2">
+                            <?= htmlspecialchars($ticket['title'])?> 
+                            </h5>
+                            <p class="text-primary fw-bold fs-4 mb-0">$<?= number_format($ticket['price'], 2) ?></p>
+                        </div>
+                    <!-- event details -->
+                     <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2 small text-muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill me-2" viewBox="0 0 16 16">
+                                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+                            </svg>
+                            <span><?= htmlspecialchars($ticket['location']) ?></span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2 small text muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar me-2" viewBox="0 0 16 16">
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                            </svg>
+                            <span><?= date('M j, Y h:i a', strtotime($ticket['event_start'])) ?></span>
+                        </div>
+                        <?php if ($ticket['description']): ?>
+                            <div class="d-flex align-items-start mb-2 small text-muted">
+                                <svg width="16" height="16" fill="currentColor" class="me-2 mt-1" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                                </svg>
+                                <span class="text-truncate"><?= htmlspecialchars(substr($ticket['description'], 0, 50)) ?>...</span>
+                            </div>
+                            <?php endif; ?>
+                     </div>
+                     
+                     <!-- badges -->
+                     <div class="d-flex gap-2 mb-3">
+                        <span class="badge <?= $ticket['visibility'] === 'private' ? 'bg-dark' : 'bg-info' ?>">
+                            <?= $ticket['visibility'] === 'private' ? '🔒 Private' : '🌍 Public' ?>
+                        </span>
+                        <span class="badge bg-light text-dark"><?= $ticket['quantity'] ?> tickets left</span>
+                    </div>
+
+                    <!-- actions -->
+                    <div class="ticket-actions mt-auto pt-3 border-top">
+                        <div class="d-grid gap-2">
+                            <a href="dashboard.php?edit=<?=(int)$ticket['id'] ?>" class = "btn btn-outline-secondary btn-sm">Edit</a> 
+
+
+                            <form method="POST" onsubmit="return confirm('Are you sure you want to delete this ticket?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value ="<?=(int)$ticket['id'] ?>">
+                                <button type= "submit" class= "btn btn-outline-danger btn-sm w-100">Delete</button>
+                            </form>
                             </div>
                         </div>
+                      </div>
+                    </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
