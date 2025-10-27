@@ -94,19 +94,16 @@ $totalTicketsCreated = $totalTicketsStmt->fetchColumn();
 //active events for display & pages
 $activeTicketsStmt = $dbo->conn->prepare("SELECT COUNT(*) FROM tickets
 WHERE is_deleted = 0
-AND sale_start <= UTC_TIMESTAMP()
-AND sale_end >= UTC_TIMESTAMP()
 AND event_end >= UTC_TIMESTAMP()");
 $activeTicketsStmt->execute();
 $activeTicketsCount = $activeTicketsStmt->fetchColumn();
 
-//expired events
+
+//expired events count
 $expiredStmt = $dbo->conn->prepare("SELECT COUNT(*) FROM tickets WHERE is_deleted = 0 AND event_end <= UTC_TIMESTAMP()");
 $expiredStmt->execute();
 $expiredEvents = $expiredStmt->fetchColumn();
 
-// fake total sales 
-$totalSales = rand(500, 5000);
 
 // Get expired events 
 $expiredCmd = "SELECT * FROM tickets WHERE is_deleted = 0 AND event_end <= UTC_TIMESTAMP() ORDER BY event_end DESC LIMIT 5";
@@ -114,7 +111,8 @@ $expiredStatement = $dbo->conn->prepare($expiredCmd);
 $expiredStatement->execute();
 $expiredTickets = $expiredStatement->fetchAll(PDO::FETCH_ASSOC);
 
-
+// fake total sales 
+$totalSales = rand(500, 5000);
 
 
  //pagination set up
@@ -131,7 +129,7 @@ $allowedFields = ['event_start', 'created_at', 'price', 'quantity', 'updated_at'
 $allowedOrder = ['asc', 'desc'];
 
 if (!in_array($sortField, $allowedFields)) $sortField = 'created_at';
-if (!in_array($order, $allowedOrder)) $order = 'asc';
+if (!in_array($sortOrder, $allowedOrder)) $sortOrder = 'desc';
 
 
  
@@ -164,8 +162,8 @@ AND event_end >= UTC_TIMESTAMP()";
 $countStmt= $dbo->conn->prepare($comm);
 $countStmt->execute();
 $totalTickets = $countStmt-> fetchColumn();
-$totalPages = ceil($activeTicketsCount / $perPage);
-
+// $totalPages = ceil($activeTicketsCount / $perPage);
+$totalPages = ceil($totalTickets / $perPage);
 ?> 
 
 
@@ -183,6 +181,12 @@ $totalPages = ceil($activeTicketsCount / $perPage);
 <body> 
     <div class="container mt-4">
         <h1 class="mb-4">Event Organizer Dashboard</h1>
+                <!-- Navigation -->
+        <div class="mb-3">
+            <a href="index.php" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-eye"></i> View Public Tickets
+            </a>
+        </div>
 
 
         <!-- error handeling  -->
@@ -243,8 +247,11 @@ $totalPages = ceil($activeTicketsCount / $perPage);
 
 
             
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="h4 mb-0">Your Tickets (<?= $totalTickets ?>)</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 mb-0">Your Tickets (<?= $activeTicketsCount ?>)</h2>
+
+
+
                 <button type="button" class="btn btn-primary" id="toggleFormBtn">
                     <i class="bi bi-plus-circle"></i> Create New Event
                 </button>
@@ -258,7 +265,18 @@ $totalPages = ceil($activeTicketsCount / $perPage);
             </section>
         </div>
 
-
+        <!-- sort by bs fields -->
+        <div class="d-flex gap-2 mb-3">
+            <strong class="align-self-center">Sort by:</strong>
+            <a href="?sort=created_at&order=desc" 
+            class="btn btn-outline-secondary btn-sm <?= ($sortField=='created_at' && $sortOrder=='desc')?'active':'' ?>">Newest</a>
+            <a href="?sort=created_at&order=asc" 
+            class="btn btn-outline-secondary btn-sm <?= ($sortField=='created_at' && $sortOrder=='asc')?'active':'' ?>">Oldest</a>
+            <a href="?sort=event_start&order=asc" 
+            class="btn btn-outline-secondary btn-sm <?= ($sortField=='event_start' && $sortOrder=='asc')?'active':'' ?>">Upcoming Soonest</a>
+            <a href="?sort=price&order=asc" class="btn btn-outline-secondary btn-sm <?= ($sortField=='price' && $sortOrder=='asc')?'active':'' ?>">Lowest Price</a>
+            <a href="?sort=price&order=desc" class="btn btn-outline-secondary btn-sm <?= ($sortField=='price' && $sortOrder=='desc')?'active':'' ?>">Highest Price</a>
+        </div>
 <!-- tickets list -->
         <section class="tickets-list">
             <?php if (empty($tickets)): ?>
@@ -267,11 +285,12 @@ $totalPages = ceil($activeTicketsCount / $perPage);
                 <div class="tickets-grid row g-3">
                     <?php foreach ($tickets as $ticket): ?>
                         <div class="ticket-card card p-0 h-100 col-md-4 position-relative shadow-sm">
-                        <?php if (!empty($ticket['image'])): ?>
-                            <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top" style="height:150px; object-fit:cover;">
-                        <?php else: ?>
-                            <img src="assets/placeholder.jpeg" class="card-img-top" style="height:150px; object-fit:cover;">
-                        <?php endif; ?>
+                            <!-- event image -->
+                            <?php if (!empty($ticket['image'])): ?>
+                                <img src="<?= htmlspecialchars($ticket['image']) ?>" class="card-img-top" style="height:150px; object-fit:cover;">
+                            <?php else: ?>
+                                <img src="assets/placeholder.jpeg" class="card-img-top" style="height:150px; object-fit:cover;">
+                            <?php endif; ?>
 
                         <!-- status badge -->
                         <span class="position-absolute top-0 end-0 m-2">
@@ -350,17 +369,17 @@ $totalPages = ceil($activeTicketsCount / $perPage);
             <nav aria-label="Ticket pagination" class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item <?= ($page == 1) ? 'disabled' : '' ?>">
-                        <a href="?page=<?= $page - 1 ?>" class="page-link">Previous</a>
+                        <a href="?page=<?= $page - 1 ?>&sort=<?= $sortField ?>&order=<?= $sortOrder ?>" class="page-link">Previous</a>
                     </li>
 
                     <?php for($i = 1; $i <= $totalPages; $i++): ?>
                         <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                            <a class="page-link" href="?page=<?= $i ?>&sort=<?= $sortField ?>&order=<?= $sortOrder ?>"><?= $i ?></a>
                         </li>
                     <?php endfor; ?>
 
                     <li class="page-item <?= ($page == $totalPages) ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
+                        <a href="?page=<?= $page + 1 ?>&sort=<?= $sortField ?>&order=<?= $sortOrder ?>" class="page-link">Next</a>
                     </li>
                 </ul>
             </nav>

@@ -102,7 +102,7 @@ header('Content-Type: application/json');
         break;
         
         case 'complete':
-            $total= 0;
+            $orderTotal= 0;
             $orderItems = []; 
             
 
