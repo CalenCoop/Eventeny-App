@@ -64,6 +64,11 @@ header('Content-Type: application/json');
                 }else{
                     echo json_encode(['success' => false, 'message' => 'Ticket not found']);
                     }
+            }else{
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Ticket does not exist'
+                ]);
             }
             break;
         
