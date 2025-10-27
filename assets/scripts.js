@@ -29,9 +29,10 @@ $(document).ready(function () {
           showAlert("Added to Cart!", "success");
           updateCartCount();
         } else {
-          alert("Error:" + response.message);
+          showAlert("Error: " + response.message, "danger");
         }
-      }
+      },
+      "json"
     );
   });
 
@@ -52,7 +53,7 @@ $(document).ready(function () {
           loadCart();
           updateCartCount();
         } else {
-          alert("Error: " + response.message);
+          showAlert("Error: " + response.message, "danger");
         }
       },
       "json"
@@ -74,7 +75,7 @@ $(document).ready(function () {
           loadCart();
           updateCartCount();
         } else {
-          alert("Error: " + response.message);
+          showAlert("Error: " + response.message, "danger");
         }
       },
       "json"
@@ -92,7 +93,7 @@ $(document).ready(function () {
           loadCart();
           showAlert("Cart Cleared", "success");
         } else {
-          alert("Error:" + response.message);
+          showAlert("Error: " + response.message, "danger");
         }
       },
       "json"
@@ -240,7 +241,7 @@ $(document).ready(function () {
       function (response) {
         if (response.success) {
           showAlert(
-            "Order completed succesfully. Thank you for your purchase.",
+            "Order completed successfully. Thank you for your purchase.",
             "success"
           );
           $("#cartModal").modal("hide");
@@ -249,7 +250,8 @@ $(document).ready(function () {
         } else {
           showAlert("Error: " + response.message, "danger");
         }
-      }
+      },
+      "json"
     );
   }
 
