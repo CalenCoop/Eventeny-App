@@ -11,68 +11,88 @@ $toDtUtc = function($v) {
     return $dt->format('Y-m-d H:i:s');
 };
 
-if($_POST && isset($_POST['action'])){
-    try{
-        if($_POST['action'] === 'create'){
-            $cmd = "INSERT INTO tickets (title, description, location, instructions, price, quantity, sale_start, sale_end, event_start, event_end, visibility, image) VALUES (?, ? , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt= $dbo-> conn-> prepare($cmd);
-            $stmt->execute([
-                $_POST['title'], 
-                $_POST['description'] ?? null,
-                $_POST['location'],
-                $_POST['instructions'] ?? null,
-                $_POST['price'],
-                $_POST['quantity'],
-                $toDtUtc($_POST['sale_start']),
-                $toDtUtc($_POST['sale_end']),
-                $toDtUtc($_POST['event_start']),
-                $toDtUtc($_POST['event_end']),
-                $_POST['visibility'],
-                $_POST['image'] ?? null
-            ]);
-            $_SESSION['success']  = "Ticket created successfully!";
-            header("Location: dashboard.php");
-            exit;
-        }
-        
-        //handle ticket updates
-    if($_POST['action']=== 'update' && !empty($_POST['id'])){
-        $cmd = "UPDATE tickets 
-            SET title = ?, description = ?, location = ?, instructions = ?, price = ?, quantity= ?, sale_start = ?, sale_end = ?, event_start = ?, event_end = ?, visibility = ?, image = ? 
-            WHERE id = ? AND is_deleted = 0";
-        $stmt= $dbo->conn->prepare($cmd);
-        $stmt->execute([
-            $_POST['title'], 
-            $_POST['description'] ?? null,
-            $_POST['location'],
-            $_POST['instructions'] ?? null,
-            $_POST['price'],
-            $_POST['quantity'],
-            $toDtUtc($_POST['sale_start']),
-            $toDtUtc($_POST['sale_end']),
-            $toDtUtc($_POST['event_start']),
-            $toDtUtc($_POST['event_end']),
-            $_POST['visibility'],
-            $_POST['image'] ?? null, 
-            $_POST['id'] 
-        ]);
-        $_SESSION['success'] = "Ticket updated successfully.";
-        header("Location: dashboard.php"); 
-        exit;
-    }
+// create event function 
+function handleCreate($dbo, $toDtUtc){
+    $cmd = "INSERT INTO tickets (title, description, location, instructions, price, quantity, sale_start, sale_end, event_start, event_end, visibility, image) VALUES (?, ? , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt= $dbo-> conn-> prepare($cmd);
+    $stmt->execute([
+        $_POST['title'], 
+        $_POST['description'] ?? null,
+        $_POST['location'],
+        $_POST['instructions'] ?? null,
+        $_POST['price'],
+        $_POST['quantity'],
+        $toDtUtc($_POST['sale_start']),
+        $toDtUtc($_POST['sale_end']),
+        $toDtUtc($_POST['event_start']),
+        $toDtUtc($_POST['event_end']),
+        $_POST['visibility'],
+        $_POST['image'] ?? null
+    ]);
+    $_SESSION['success']  = "Ticket created successfully!";
+    header("Location: dashboard.php");
+    exit;
+}
 
-    //soft-delete ticket
-    if($_POST['action']==='delete' && !empty($_POST['id'])){
-        $stmt = $dbo->conn->prepare("UPDATE tickets SET is_deleted = 1 WHERE id = ?");
-        $stmt->execute([$_POST['id']]);
-        $_SESSION['success'] = "Ticket deleted.";
+//update event function 
+function handleUpdate($dbo, $toDtUtc){
+    if(empty($_POST['id'])){
+        $_SESSION['error'] = "Missing ticket id.";
         header("Location: dashboard.php");
         exit;
+    }
+    $cmd = "UPDATE tickets 
+            SET title = ?, description = ?, location = ?, instructions = ?, price = ?, quantity= ?, sale_start = ?, sale_end = ?, event_start = ?, event_end = ?, visibility = ?, image = ? 
+            WHERE id = ? AND is_deleted = 0";
+    $stmt= $dbo->conn->prepare($cmd);
+    $stmt->execute([
+        $_POST['title'], 
+        $_POST['description'] ?? null,
+        $_POST['location'],
+        $_POST['instructions'] ?? null,
+        $_POST['price'],
+        $_POST['quantity'],
+        $toDtUtc($_POST['sale_start']),
+        $toDtUtc($_POST['sale_end']),
+        $toDtUtc($_POST['event_start']),
+        $toDtUtc($_POST['event_end']),
+        $_POST['visibility'],
+        $_POST['image'] ?? null, 
+        $_POST['id'] 
+    ]);
+    $_SESSION['success'] = "Ticket updated successfully.";
+    header("Location: dashboard.php"); 
+    exit;
+}
+
+//delete function
+function handleDelete($dbo){
+    if(empty($_POST['id'])){
+        $_SESSION['error'] = "Missing ticket id.";
+        header("Location: dashboard.php");
+        exit;
+    }
+    $stmt = $dbo->conn->prepare("UPDATE tickets SET is_deleted = 1 WHERE id = ?");
+    $stmt->execute([$_POST['id']]);
+    $_SESSION['success'] = "Ticket deleted.";
+    header("Location: dashboard.php");
+    exit;
+}
+
+if($_POST && isset($_POST['action'])){
+    try{
+        $actions = [
+            'create' => function() use ($dbo, $toDtUtc){ handleCreate($dbo, $toDtUtc); },
+            'update' => function() use ($dbo, $toDtUtc){ handleUpdate($dbo, $toDtUtc); },
+            'delete' => function() use ($dbo){ handleDelete($dbo); }
+        ];
+        if(isset($actions[$_POST['action']])){
+            $actions[$_POST['action']]();
         }
     }catch(PDOException $e){
             $_SESSION['error'] = "Error creating ticket:" . $e->getMessage();
-        }
     }
+}
     
 
     $edit = null; 
