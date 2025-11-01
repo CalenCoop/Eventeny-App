@@ -1,5 +1,15 @@
 # QuickTix-Project
 
+<img src="https://github.com/user-attachments/assets/3aad5c0a-f922-4e80-9e9d-fbd7b9a1972e" 
+     alt="ScreenRecording" 
+     width="600" 
+     height="600">
+
+
+
+
+
+
 ## Description
 
 This is a full-stack event management system built for a product engineering interview. Event organizers can create, view, edit, and delete tickets with full CRUD capabilities, while ticket buyers can browse public events, add tickets to a cart, and complete mock checkouts - all with dynamic AJAX updates and zero page reloads.
