@@ -3,7 +3,7 @@ class Database{
     private $servername= "localhost";
     private $username = "root";
     private $password = "";
-    private $dbname = "Eventeny";
+    private $dbname = "TicketFlow";
     public $conn= "";
     
     public function __construct(){

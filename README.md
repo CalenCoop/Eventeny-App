@@ -1,4 +1,4 @@
-# Eventeny-Project
+# TicketFlow-Project
 
 ## Description
 
@@ -32,9 +32,9 @@ This is a full-stack event management system built for a product engineering int
 
 ## Key Technical Concepts
 
+- **AJAX/JSON**: Dynamic updates without page reloads
 - **Prepared Statements**: PDO prevents SQL injection
 - **Session Management**: Server-side cart persistence
-- **AJAX/JSON**: Dynamic updates without page reloads
 - **Event Delegation**: Handling dynamically loaded elements
 - **Soft Delete Pattern**: Maintaining data integrity
 - **UTC Timestamps**: Consistent timezone handling
@@ -42,9 +42,9 @@ This is a full-stack event management system built for a product engineering int
 ## Lessons Learned
 
 - Handling AJAX cart operations with jQuery and session management
-- Using Bootstrap for rapid, professional UI development
 - Designing a modal checkout flow that updates dynamically without navigation
 - Balancing code quality with interview timeline constraints
+- Using Bootstrap for rapid, professional UI development
 - Implementing UTC conversion for consistent date storage across timezones
 
 ## Future Improvements
