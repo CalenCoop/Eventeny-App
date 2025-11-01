@@ -1,4 +1,4 @@
-# TicketFlow-Project
+# QuickTix-Project
 
 ## Description
 
